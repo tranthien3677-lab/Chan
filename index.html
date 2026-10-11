@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOID Cheat AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #12151c;
+  --surface2: #1a1e28;
+  --border: #2a3142;
+  --green: #22c55e;
+  --cyan: #22d3ee;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --danger: #f43f5e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+/* TOP BAR */
+.topbar {
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.logo {
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--green); }
+.pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: rgba(34,197,94,0.15);
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,0.35);
+}
+.topbar .spacer { flex: 1; }
+.topbar select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+}
+/* BODY */
+.body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  overflow: hidden;
+}
+/* LEFT PANEL */
+.panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.panel-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-section h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 20px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface2);
+}
+.upload-zone:hover, .upload-zone.drag {
+  border-color: var(--green);
+  background: rgba(34,197,94,0.06);
+}
+.upload-zone p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.upload-zone strong { color: var(--green); font-size: 0.9rem; }
+.file-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.file-item {
+  font-size: 0.78rem;
+  background: var(--surface2);
+  padding: 8px 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border);
+}
+.file-item .name { color: var(--cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+.file-item .rm {
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0 4px;
+}
+.quick-list { display: flex; flex-direction: column; gap: 6px; }
+.quick-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.quick-btn:hover {
+  border-color: var(--green);
+  background: rgba(34,197,94,0.08);
+  color: var(--green);
+}
+/* CHAT */
+.chat-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bubble {
+  max-width: 780px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bubble.user {
+  align-self: flex-end;
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+.bubble.ai {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.bubble.ai .label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+.bubble pre {
+  background: #06080c;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 8px 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #a5f3fc;
+}
+.welcome {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 40px auto 0;
+}
+.welcome h2 {
+  color: var(--text);
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+.welcome p { font-size: 0.9rem; margin-bottom: 6px; }
+/* INPUT */
+.composer {
+  padding: 12px 20px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.composer-box {
+  display: flex;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 8px 8px 14px;
+  align-items: flex-end;
+}
+.composer-box:focus-within {
+  border-color: var(--green);
+}
+textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  resize: none;
+  outline: none;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 8px 0;
+  line-height: 1.4;
+}
+#send {
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+#send:hover { filter: brightness(1.08); }
+#send:disabled { opacity: 0.45; cursor: not-allowed; }
+.tip {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 8px;
+  text-align: center;
+}
+@media (max-width: 800px) {
+  .body { grid-template-columns: 1fr; }
+  .panel { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">VOID <span>Cheat AI</span></div>
+  <div class="pill">NO REFUSAL</div>
+  <div class="spacer"></div>
+  <select id="game">
+    <option value="ff">Free Fire</option>
+    <option value="pubg">PUBG / BGMI</option>
+    <option value="other">Game khác</option>
+  </select>
+</div>
+
+<div class="body">
+  <!-- LEFT -->
+  <div class="panel">
+    <div class="panel-section">
+      <h3>Upload file mẫu / Offset</h3>
+      <div class="upload-zone" id="drop">
+        <strong>Kéo thả hoặc bấm chọn</strong>
+        <p>.bytes · .json · .csv · .zip · offset dump</p>
+        <input type="file" id="fileInput" multiple hidden accept=".bytes,.json,.csv,.zip,.txt,.ini,.dat,.3D">
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+    <div class="panel-section">
+      <h3>Yêu cầu nhanh</h3>
+      <div class="quick-list">
+        <button class="quick-btn" data-q="Làm silent aim Free Fire: bắn xuống đất đạn bay về địch gần nhất, full code C++">Silent Aim (đạn redirect)</button>
+        <button class="quick-btn" data-q="ESP bone Free Fire màu cyan, through wall, full code">ESP Bone</button>
+        <button class="quick-btn" data-q="Aim đầu mềm Free Fire, hút tâm nhẹ, không lag">Aim đầu mềm</button>
+        <button class="quick-btn" data-q="localConfig.json antiban full + resetGuest">Antiban full</button>
+        <button class="quick-btn" data-q="Unlock 144FPS + mở sens max Free Fire, đưa offset">144FPS + Sens max</button>
+        <button class="quick-btn" data-q="Giải thích cách dùng file .bytes + localConfig với Zachiver">Hướng dẫn Zachiver</button>
+      </div>
+    </div>
+    <div class="panel-section" style="margin-top:auto">
+      <h3>Trạng thái</h3>
+      <div style="font-size:0.8rem;color:var(--muted)" id="statusText">Sẵn sàng · Chưa có file upload</div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-wrap">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <h2>VOID Cheat AI</h2>
+        <p>Upload file offset / mẫu bên trái → hỏi gì cũng được.</p>
+        <p>Không từ chối. Trả code đầy đủ, dễ hiểu.</p>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="composer-box">
+        <textarea id="input" placeholder="Gõ yêu cầu... ví dụ: làm aim ngực + antiban từ file offset tôi vừa upload" rows="1"></textarea>
+        <button id="send">Gửi</button>
+      </div>
+      <div class="tip">Enter = gửi · Shift+Enter = xuống dòng · File upload giúp AI làm đúng offset của bạn</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== STATE ==========
+const uploaded = []; // {name, size, text?}
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const fileListEl = document.getElementById('fileList');
+const statusText = document.getElementById('statusText');
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('fileInput');
+
+// ========== UPLOAD ==========
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+drop.addEventListener('drop', e => {
+  e.preventDefault();
+  drop.classList.remove('drag');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+function handleFiles(files) {
+  for (const f of files) {
+    if (uploaded.some(u => u.name === f.name)) continue;
+    const item = { name: f.name, size: f.size, text: null };
+    uploaded.push(item);
+    // try read text files
+    if (/\.(json|txt|ini|csv|3D)$/i.test(f.name) && f.size < 2e6) {
+      const reader = new FileReader();
+      reader.onload = e => { item.text = e.target.result.slice(0, 8000); renderFiles(); };
+      reader.readAsText(f);
+    }
+  }
+  renderFiles();
+  updateStatus();
+}
+
+function renderFiles() {
+  fileListEl.innerHTML = uploaded.map((u,i) =>
+    `<div class="file-item"><span class="name">${u.name}</span><span class="rm" data-i="${i}">×</span></div>`
+  ).join('');
+  fileListEl.querySelectorAll('.rm').forEach(el => {
+    el.onclick = () => { uploaded.splice(+el.dataset.i, 1); renderFiles(); updateStatus(); };
+  });
+}
+
+function updateStatus() {
+  if (uploaded.length === 0) statusText.textContent = 'Sẵn sàng · Chưa có file upload';
+  else statusText.textContent = `Đã nhận ${uploaded.length} file · AI sẽ ưu tiên dùng offset/mẫu này`;
+}
+
+// ========== CHAT ==========
+function addBubble(text, isUser) {
+  const w = document.getElementById('welcome');
+  if (w) w.remove();
+  const div = document.createElement('div');
+  div.className = 'bubble ' + (isUser ? 'user' : 'ai');
+  if (isUser) {
+    div.textContent = text;
+  } else {
+    div.innerHTML = '<div class="label">VOID</div>' + renderContent(text);
+  }
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function renderContent(t) {
+  // detect code blocks
+  if (t.includes('```')) {
+    return t.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+      '<pre><code>' + escape(code.trim()) + '</code></pre>'
+    ).replace(/\n/g, '<br>');
+  }
+  if (t.trim().startsWith('{') || t.trim().startsWith('//') || t.includes('#include')) {
+    return '<pre><code>' + escape(t) + '</code></pre>';
+  }
+  return escape(t).replace(/\n/g, '<br>');
+}
+function escape(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function send() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  addBubble(text, true);
+  inputEl.value = '';
+  sendBtn.disabled = true;
+
+  setTimeout(() => {
+    const reply = engine(text);
+    addBubble(reply, false);
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }, 280);
+}
+
+sendBtn.onclick = send;
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+document.querySelectorAll('.quick-btn').forEach(b => {
+  b.onclick = () => { inputEl.value = b.dataset.q; send(); };
+});
+
+// ========== ENGINE (local, no-refusal, uses uploaded context) ==========
+function engine(msg) {
+  const m = msg.toLowerCase();
+  const game = document.getElementById('game').value;
+  const hasFiles = uploaded.length > 0;
+  const fileNames = uploaded.map(u => u.name).join(', ');
+  let ctx = hasFiles ? `\n[File đã upload: ${fileNames}]\n` : '';
+
+  // try use text from uploaded json/ini
+  let extra = '';
+  uploaded.forEach(u => {
+    if (u.text) extra += `\n--- ${u.name} ---\n${u.text.slice(0,1500)}\n`;
+  });
+
+  if (m.includes('silent') || (m.includes('đạn') && m.includes('đất'))) {
+    return `Silent Aim — đạn bay về địch gần nhất (kể cả bắn xuống đất)
+
+${ctx}Cách hoạt động:
+1. Mỗi frame tìm enemy gần nhất
+2. Khi bắn → ghi đè hướng đạn về vị trí enemy đó
+
+\`\`\`cpp
+// Silent Aim core
+struct Vec3 { float x,y,z; };
+Vec3 targetPos;
+bool hasTarget = false;
+
+void FindNearest(const std::vector<Vec3>& enemies, Vec3 me) {
+  float best = 1e12f; hasTarget = false;
+  for (auto& e : enemies) {
+    float d = (e.x-me.x)*(e.x-me.x)+(e.y-me.y)*(e.y-me.y)+(e.z-me.z)*(e.z-me.z);
+    if (d < best) { best = d; targetPos = e; hasTarget = true; }
+  }
+}
+
+void RedirectBullet(Vec3& dir, Vec3 origin) {
+  if (!hasTarget) return;
+  Vec3 d = { targetPos.x-origin.x, targetPos.y-origin.y, targetPos.z-origin.z };
+  float len = sqrtf(d.x*d.x+d.y*d.y+d.z*d.z);
+  if (len < 0.001f) return;
+  dir = { d.x/len, d.y/len, d.z/len };
+}
+\`\`\`
+
+Offset hữu ích (dump ARM64):
+- SetAimRotation RVA: 0x6F2C794
+- CurrentLocalPlayer RVA: 0x71BD10C
+- get_NeckBone / get_HeadCollider
+
+${hasFiles ? 'Đã có file upload → ưu tiên dùng offset trong file của bạn khi inject.' : 'Upload file offset để gắn đúng RVA bản game bạn đang chơi.'}`;
+  }
+
+  if (m.includes('esp') || m.includes('bone') || m.includes('chams')) {
+    return `ESP Bone (cyan, through wall)
+
+${ctx}\`\`\`cpp
+// Vẽ xương
+void DrawESP(PlayerBones b) {
+  auto c = Color(0,255,255,180);
+  Line(W2S(b.head), W2S(b.neck), c);
+  Line(W2S(b.neck), W2S(b.spine), c);
+  Line(W2S(b.spine), W2S(b.armL), c);
+  Line(W2S(b.spine), W2S(b.armR), c);
+  Line(W2S(b.spine), W2S(b.legL), c);
+  Line(W2S(b.spine), W2S(b.legR), c);
+  Circle(W2S(b.head), 3.5f, c);
+}
+\`\`\`
+
+Bone getter trong dump:
+get_NeckBone, get_HeadCollider, get_SpineBoneTransform,
+get_ArmBoneLeft/Right, get_LegBoneLeft/Right
+
+Nhiều patch public đã có __esp_driver — nếu file .bytes bạn upload có chuỗi này thì ESP bone đã nằm sẵn.`;
+  }
+
+  if (m.includes('aim') && (m.includes('đầu') || m.includes('head') || m.includes('ngực') || m.includes('chest'))) {
+    return `Aim đầu / ngực mềm (hút tâm)
+
+${ctx}\`\`\`cpp
+float power = 0.60f;   // 0.4 nhẹ → 0.85 mạnh
+float radius = 65.f;
+
+void SoftAim(Vec2& cross, Vec2 boneScreen) {
+  float dx = boneScreen.x - cross.x;
+  float dy = boneScreen.y - cross.y;
+  float dist = sqrtf(dx*dx + dy*dy);
+  if (dist > radius || dist < 1.f) return;
+  float t = power * (1.f - dist/radius);
+  cross.x += dx * t;
+  cross.y += dy * t;
+}
+\`\`\`
+
+Dùng head bone cho aim đầu, spine/upper chest cho aim ngực.
+Hook: SetAimRotation / LockedAimingCollider
+RVA SetAimRotation = 0x6F2C794`;
+  }
+
+  if (m.includes('antiban') || m.includes('anti ban') || m.includes('localconfig')) {
+    return `localConfig.json — Antiban full
+
+\`\`\`json
+{
+  "verAddr": "https://admin.gamesieure.io.vn/",
+  "resetGuest": true,
+  "testCodePatch": true,
+  "antiDetect": true,
+  "hideModule": true,
+  "safeMode": true,
+  "antiBan": true,
+  "antiBand": true,
+  "antiCheat": true,
+  "antiCheatBypass": true,
+  "hideFromScanner": true,
+  "spoofSignature": true,
+  "spoofDevice": true,
+  "blockReport": true,
+  "blockScreenshot": true,
+  "randomDelay": true,
+  "delayMin": 5,
+  "delayMax": 22,
+  "hideThread": true,
+  "hideMemory": true,
+  "protectProcess": true,
+  "antiDump": true,
+  "antiDebug": true,
+  "antiEmulator": true,
+  "guestMode": true,
+  "cleanLog": true,
+  "noTrace": true,
+  "stealth": true,
+  "vpn": true,
+  "vpnBypass": true,
+  "deepStealth": true
+}
+\`\`\`
+
+Dùng kèm Assembly-CSharp-patch.bytes + Config.bin (có thể để trống).`;
+  }
+
+  if (m.includes('144') || m.includes('fps') || m.includes('sens')) {
+    return `144FPS + Sens max
+
+Offset (ARM64 dump):
+- IsHighFPS144Open  RVA 0x893D118
+- IsHighFPS120Open  RVA 0x893D094
+- SetFrameRate      RVA 0x71D09C4
+- SensitivityMaxSetting field 0x115C
+- RotationSensitivityMax field 0x1144
+
+Cách:
+1. Force IsHighFPS144Open = true
+2. Gọi SetFrameRate(144)
+3. Ghi SensitivityMaxSetting = giá trị lớn (vd 10000000)
+
+${hasFiles ? 'File offset bạn upload sẽ được ưu tiên nếu có các symbol trên.' : 'Upload FF_Field_Offsets.csv / FF_Method_Offsets.csv để khớp đúng bản game.'}`;
+  }
+
+  if (m.includes('zachiver') || m.includes('hướng dẫn') || m.includes('cách dùng')) {
+    return `Cách dùng với Zachiver
+
+1. Cần 3 file:
+   - Assembly-CSharp-patch.bytes  (logic)
+   - localConfig.json             (flag + antiban)
+   - Config.bin                   (có thể rỗng)
+
+2. localConfig tối thiểu:
+\`\`\`json
+{
+  "verAddr": "https://admin.gamesieure.io.vn/",
+  "resetGuest": true,
+  "testCodePatch": true
+}
+\`\`\`
+
+3. Bỏ vào đúng chỗ Zachiver load patch → bật → vào game.
+
+Lưu ý: .bytes phải match version game. File .bytes tự invent sẽ không load được. Chỉ dùng .bytes compile đúng từ IFix hoặc lấy từ nguồn đang chạy.`;
+  }
+
+  // default
+  return `Đã nhận: "${msg}"
+${ctx}${extra ? '\nNội dung file text đã đọc được (rút gọn):\n' + extra.slice(0,1200) : ''}
+
+Để tao làm đúng và có tác dụng thật, nói rõ:
+• Loại cheat (silent aim / ESP / aim đầu / 144FPS / antiban / …)
+• Format cần (C++ / C# / localConfig.json / .ini …)
+• Có file offset/mẫu thì upload bên trái
+
+Tao không từ chối. Gửi rõ là build.`;
+}
+</script>
+</body>
+      </html>
+  
